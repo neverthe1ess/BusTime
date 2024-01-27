@@ -7,26 +7,19 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.widget.TextView;
 
-import com.google.gson.annotations.SerializedName;
+import com.example.bustime.repository.api.dto.routeData.PostResult;
 
 import java.io.IOException;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String BASE_URL = "http://bus.andong.go.kr:8080/";
+
     TextView textView;
 
 
@@ -38,17 +31,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
         textView = findViewById(R.id.textView);
 
-        // Retrofit 초기화
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        // Retrofit 인터페이스를 사용하여 서비스 생성
-        RetrofitService service = retrofit.create(RetrofitService.class);
 
         // 네트워크 요청 예제
-        Call<PostResult> call = service.getPosts("370000023");
+        Call<PostResult> call = retrofitSerivice.getPosts("type=All");
 
         call.enqueue(new Callback<PostResult>() {
             @Override
@@ -57,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                     PostResult result = response.body();
                     textView.setText(result.toString());
                     Log.e(TAG, "onResponse: 성공, 결과\n" + result.toString());
-                } else {
+                } else { // 300 ~ 400
                     try {
                         textView.setText(response.errorBody().string());
                     } catch (IOException e) {
