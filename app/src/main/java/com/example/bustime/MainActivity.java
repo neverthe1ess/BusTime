@@ -2,13 +2,18 @@ package com.example.bustime;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
+import static com.example.bustime.repository.api.RetrofitClient.getRetrofitService;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.MutableLiveData;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.example.bustime.repository.api.RetrofitClient;
+import com.example.bustime.repository.api.RetrofitService;
 import com.example.bustime.repository.api.dto.routeData.PostResult;
 
 import java.io.IOException;
@@ -22,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
 
     TextView textView;
 
+    // private final static String SECERT_KEY = "test";
+    private RetrofitService retrofitService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +38,15 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
         textView = findViewById(R.id.textView);
 
+        RetrofitClient retrofitClient = RetrofitClient.getInstance();
+
+        retrofitService = getRetrofitService();
+
+        // RetrofitService service1 = retrofitService.getBusArrivalData();
 
 
         // 네트워크 요청 예제
-        Call<PostResult> call = retrofitSerivice.getPosts("type=All");
+        Call<PostResult> call = retrofitService.getRouteData("All");
 
         call.enqueue(new Callback<PostResult>() {
             @Override
@@ -43,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                     PostResult result = response.body();
                     textView.setText(result.toString());
                     Log.e(TAG, "onResponse: 성공, 결과\n" + result.toString());
-                } else { // 300 ~ 400
+                } else { // 3xx ~ 4xx
                     try {
                         textView.setText(response.errorBody().string());
                     } catch (IOException e) {
