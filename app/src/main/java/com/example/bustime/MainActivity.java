@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.example.bustime.repository.api.RetrofitClient;
 import com.example.bustime.repository.api.RetrofitService;
 import com.example.bustime.repository.api.dto.routeData.PostResult;
+import com.example.bustime.repository.api.dto.stopData.StopPostResults;
 
 import java.io.IOException;
 
@@ -46,13 +47,38 @@ public class MainActivity extends AppCompatActivity {
 
 
         // 네트워크 요청 예제
-        Call<PostResult> call = retrofitService.getRouteData("All");
+        Call<PostResult> routeDataCall = retrofitService.getRouteData("All");
 
-        call.enqueue(new Callback<PostResult>() {
+        routeDataCall.enqueue(new Callback<PostResult>() {
             @Override
             public void onResponse(Call<PostResult> call, Response<PostResult> response) {
                 if (response.isSuccessful()) {
                     PostResult result = response.body();
+                    //textView.setText(result.toString());
+                    Log.e(TAG, "onResponse: 성공, 결과\n" + result.toString());
+                } else { // 3xx ~ 4xx
+                    try {
+                        textView.setText(response.errorBody().string());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Log.e(TAG, "onResponse: 실패");
+                }
+            }
+            @Override
+            public void onFailure(Call<PostResult> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage());
+            }
+        });
+
+
+        Call<StopPostResults> arrivalDataCall = retrofitService.getBusArrivalData("354000407");
+
+        arrivalDataCall.enqueue(new Callback<StopPostResults>(){
+            @Override
+            public void onResponse(Call<StopPostResults> call, Response<StopPostResults> response) {
+                if (response.isSuccessful()) {
+                    StopPostResults result = response.body();
                     textView.setText(result.toString());
                     Log.e(TAG, "onResponse: 성공, 결과\n" + result.toString());
                 } else { // 3xx ~ 4xx
@@ -64,11 +90,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, "onResponse: 실패");
                 }
             }
-
             @Override
-            public void onFailure(Call<PostResult> call, Throwable t) {
+            public void onFailure(Call<StopPostResults> call, Throwable t) {
                 Log.e(TAG, "onFailure: " + t.getMessage());
             }
         });
+
     }
 }

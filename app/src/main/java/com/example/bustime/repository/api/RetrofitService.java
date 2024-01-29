@@ -1,6 +1,7 @@
 package com.example.bustime.repository.api;
 
 import com.example.bustime.repository.api.dto.routeData.PostResult;
+import com.example.bustime.repository.api.dto.stopData.StopPostResults;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -14,7 +15,7 @@ public interface RetrofitService {
 
     //2. 정류소 버스도착정보(단위: minute) http://bus.andong.go.kr:8080/api/facilities/station/getBusArriveData?stationId=370000023
     @GET("api/facilities/station/getBusArriveData")
-    Call<PostResult> getBusArrivalData(@Query("stationId=") String stationId);
+    Call<StopPostResults> getBusArrivalData(@Query("stationId") String stationId);
 
     //3. 노선 정보 제공 서비스 http://bus.andong.go.kr:8080/api/route/getDataList?type=All
     @GET("api/route/getDataList")
