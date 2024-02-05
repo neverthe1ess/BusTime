@@ -149,7 +149,8 @@ public class StopBusResults
     @Override
     public String toString()
     {
-        return "ClassPojo [postPlateNo = "+postPlateNo+", govCd = "+govCd+", remainStation = "+remainStation+", routeId = "+routeId+", predictTm = "+predictTm+", govCdNm = "+govCdNm+", plateNo = "+plateNo+", stationOrd = "+stationOrd+", arrvVehId = "+arrvVehId+", routeNum = "+routeNum+", routeNm = "+routeNm+", via = "+via+"]";
+//        return "result [postPlateNo = "+postPlateNo+", govCd = "+govCd+", remainStation = "+remainStation+", routeId = "+routeId+", predictTm = "+predictTm+", govCdNm = "+govCdNm+", plateNo = "+plateNo+", stationOrd = "+stationOrd+", arrvVehId = "+arrvVehId+", routeNum = "+routeNum+", routeNm = "+routeNm+", via = "+via+"]";
+        return "result [" + "노선번호 : " + routeNm + "예상시간 : "+ predictTm + "남은 정거장 수 : " + remainStation + "]" ;
     }
 }
 

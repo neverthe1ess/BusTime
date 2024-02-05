@@ -1,6 +1,7 @@
 package com.example.bustime.repository.api.dto.stopData;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class StopPostResults
 {
@@ -14,7 +15,7 @@ public class StopPostResults
 
     private String type;
 
-    private StopBusResults[] results;
+    private List<StopBusResults> results;
 
     public String getCode ()
     {
@@ -66,12 +67,12 @@ public class StopPostResults
         this.type = type;
     }
 
-    public StopBusResults[] getResults ()
+    public List<StopBusResults> getStArriveResults()
     {
         return results;
     }
 
-    public void setResults (StopBusResults[] results)
+    public void setStArriveResults (List<StopBusResults> results)
     {
         this.results = results;
     }
@@ -79,6 +80,6 @@ public class StopPostResults
     @Override
     public String toString()
     {
-        return "ClassPojo [code = "+code+", parameter = "+parameter+", count = "+count+", description = "+description+", type = "+type+", results = "+ Arrays.toString(results)+ "]";
+        return "ClassPojo [code = "+code+", parameter = "+parameter+", count = "+count+", description = "+description+", type = "+type+", results = "+ "]";
     }
 }

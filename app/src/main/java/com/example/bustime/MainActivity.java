@@ -6,7 +6,8 @@ import static com.example.bustime.repository.api.RetrofitClient.getRetrofitServi
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.MutableLiveData;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -15,9 +16,12 @@ import android.widget.TextView;
 import com.example.bustime.repository.api.RetrofitClient;
 import com.example.bustime.repository.api.RetrofitService;
 import com.example.bustime.repository.api.dto.routeData.PostResult;
+import com.example.bustime.repository.api.dto.stopData.StopBusResults;
 import com.example.bustime.repository.api.dto.stopData.StopPostResults;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     // private final static String SECERT_KEY = "test";
     private RetrofitService retrofitService;
+    private StopPostResults postResults;
+    private List<StopBusResults> stopBusResultsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +43,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
+
         textView = findViewById(R.id.textView);
+        stopBusResultsList = new ArrayList<>();
 
         RetrofitClient retrofitClient = RetrofitClient.getInstance();
-
         retrofitService = getRetrofitService();
 
         // RetrofitService service1 = retrofitService.getBusArrivalData();
@@ -54,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<PostResult> call, Response<PostResult> response) {
                 if (response.isSuccessful()) {
                     PostResult result = response.body();
-                    //textView.setText(result.toString());
                     Log.e(TAG, "onResponse: 성공, 결과\n" + result.toString());
                 } else { // 3xx ~ 4xx
                     try {
@@ -72,15 +78,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        Call<StopPostResults> arrivalDataCall = retrofitService.getBusArrivalData("354000407");
+        Call<StopPostResults> arrivalDataCall = retrofitService.getBusArrivalData("370000023");
 
         arrivalDataCall.enqueue(new Callback<StopPostResults>(){
             @Override
             public void onResponse(Call<StopPostResults> call, Response<StopPostResults> response) {
                 if (response.isSuccessful()) {
-                    StopPostResults result = response.body();
-                    textView.setText(result.toString());
-                    Log.e(TAG, "onResponse: 성공, 결과\n" + result.toString());
+                    postResults = response.body();
+                    stopBusResultsList = postResults.getStArriveResults();
+
+                    RecyclerView mRecycleView = (RecyclerView) findViewById(R.id.recyclerView);
+                    CustomAdapter mCustomAdapter = new CustomAdapter(postResults, stopBusResultsList);
+                    mRecycleView.setAdapter(mCustomAdapter);
+                    mRecycleView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+
+                    Log.e(TAG, "onResponse: 성공, 결과\n" + postResults.toString());
                 } else { // 3xx ~ 4xx
                     try {
                         textView.setText(response.errorBody().string());
@@ -95,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "onFailure: " + t.getMessage());
             }
         });
+
 
     }
 }
