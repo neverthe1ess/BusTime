@@ -6,11 +6,15 @@ import static com.example.bustime.repository.api.RetrofitClient.getRetrofitServi
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.bustime.repository.api.RetrofitClient;
@@ -27,10 +31,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-
-    TextView textView;
+    MenuItem mSearch;
+    TextView textView, testSearch;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     // private final static String SECERT_KEY = "test";
     private RetrofitService retrofitService;
@@ -44,7 +49,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
+        swipeRefreshLayout = findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setOnRefreshListener(this);
         textView = findViewById(R.id.textView);
+        testSearch = findViewById(R.id.testSearch);
         stopBusResultsList = new ArrayList<>();
 
         RetrofitClient retrofitClient = RetrofitClient.getInstance();
@@ -108,6 +116,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+        mSearch = menu.findItem(R.id.search);
+
+
+        SearchView sv = (SearchView) mSearch.getActionView();
+
+        sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //testSearch.setText(query + "검색함!");
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                testSearch.setText(newText + "검색함!");
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onRefresh() {
 
     }
 }
