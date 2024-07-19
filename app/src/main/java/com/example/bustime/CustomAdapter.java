@@ -36,8 +36,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.getBusTime().setText(mResultList.get(position).getPredictTm());
-            holder.getRemainStation().setText(mResultList.get(position).getRemainStation());
+            holder.getBusTime().setText(mResultList.get(position).getPredictTm() + " 분 남음");
+            holder.getRemainStation().setText(mResultList.get(position).getRemainStation() + " 정거장 남음");
             holder.getBusNumber().setText(mResultList.get(position).getRouteNm());
     }
 

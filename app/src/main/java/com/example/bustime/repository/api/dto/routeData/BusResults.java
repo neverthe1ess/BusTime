@@ -1,7 +1,5 @@
 package com.example.bustime.repository.api.dto.routeData;
 
-import com.google.gson.annotations.SerializedName;
-
 public class BusResults
 {
     private String postPlateNo;

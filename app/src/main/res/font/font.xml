@@ -9,8 +9,6 @@
         android:font="@font/bareon_bold"
         android:fontWeight="400"
         android:fontStyle="normal"
-
-
         />
 
 </font-family>
