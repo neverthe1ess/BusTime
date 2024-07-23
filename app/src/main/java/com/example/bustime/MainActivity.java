@@ -1,7 +1,5 @@
 package com.example.bustime;
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
-
 import static com.example.bustime.repository.api.RetrofitClient.getRetrofitService;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -17,7 +15,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -25,6 +22,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.bustime.bustimedatabase.BusStop;
+import com.example.bustime.bustimedatabase.BusStopDatabase;
 import com.example.bustime.repository.api.RetrofitClient;
 import com.example.bustime.repository.api.RetrofitService;
 import com.example.bustime.repository.api.dto.routeData.PostResult;
@@ -32,7 +31,6 @@ import com.example.bustime.repository.api.dto.stopData.StopBusResults;
 import com.example.bustime.repository.api.dto.stopData.StopPostResults;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     MenuItem mSearch;
-    TextView textView, testSearch;
+    TextView textView;
     SwipeRefreshLayout swipeRefreshLayout;
 
     // private final static String SECERT_KEY = "test";
@@ -54,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private List<StopBusResults> stopBusResultsList;
     private FusedLocationProviderClient fusedLocationClient;
     private RecyclerView recyclerView;
+    private static final String TAG = "MainActivity";
+    private BusStopDatabase busStopDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +71,19 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         RetrofitClient retrofitClient = RetrofitClient.getInstance();
         retrofitService = getRetrofitService();
-        
+
+        dataUpdate();
+
+        busStopDatabase = BusStopDatabase.getInstance(this);
+        new Thread(() -> {
+            List<BusStop> busStops = busStopDatabase.busStopDao().getAllBusStops();
+            Log.e(TAG, "onCreate: " + busStops.get(1).busStopId);
+        }).start();
+
+
+    }
+
+    private void dataUpdate() {
         fetchRouthData();
         fetchBusArrivalData("370000023");
     }
@@ -84,8 +96,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        textView = findViewById(R.id.textView2);
-        testSearch = findViewById(R.id.testSearch);
+        textView = findViewById(R.id.gpsLocation);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -105,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                testSearch.setText(newText + "검색함!");
+                //testSearch.setText(newText + "검색함!");
                 return true;
             }
         });
@@ -120,8 +131,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     public void busInfoUpdate(){
         //testSearch.setText("refresh");
-        fetchRouthData();
-        fetchBusArrivalData("370000023");
+        dataUpdate();
     }
 
     private void fetchRouthData() {
@@ -129,10 +139,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         routeDataCall.enqueue(new Callback<PostResult>() {
             @Override
             public void onResponse(Call<PostResult> call, Response<PostResult> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful()) { // HTTP 200 성공
                     PostResult result = response.body();
                     Log.e(TAG, "onResponse: 성공, 결과\n" + result.toString());
-                } else { // 3xx ~ 4xx
+                } else { // 3xx ~ 4xx 서버 사이드 오류
                     try {
                         Log.e(TAG, "onResponse: 실패 - 3xx ~ 4xx 사이의 서버 사이드 오류 + " + response.errorBody().string());
                     } catch (IOException e) {
