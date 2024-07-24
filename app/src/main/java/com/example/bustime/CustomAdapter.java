@@ -8,12 +8,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.bustime.repository.api.dto.stationData.MyPojo;
 import com.example.bustime.repository.api.dto.stopData.StopBusResults;
 import com.example.bustime.repository.api.dto.stopData.StopPostResults;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
@@ -30,7 +27,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_recyclerview, parent, false);
+                .inflate(R.layout.businfo_recyclerview, parent, false);
         return new ViewHolder(view);
     }
 
@@ -68,6 +65,5 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
        }
 
        public TextView getRemainStation() {return remainStation; }
-
     }
 }

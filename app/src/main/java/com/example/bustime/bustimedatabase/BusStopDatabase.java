@@ -2,6 +2,7 @@ package com.example.bustime.bustimedatabase;
 
 import android.content.Context;
 
+import androidx.room.AutoMigration;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -16,7 +17,7 @@ public abstract class BusStopDatabase extends RoomDatabase {
         if(INSTANCE == null){
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                     BusStopDatabase.class,
-                    "testDataBase3.db")
+                    "BusStop.db")
                     .createFromAsset("database/BusStop.db")
                     .build();
         }

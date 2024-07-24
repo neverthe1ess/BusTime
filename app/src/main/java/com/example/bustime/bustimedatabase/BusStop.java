@@ -26,4 +26,7 @@ public class BusStop {
     @ColumnInfo(name = "gov_name")
     public String govName;
 
+    @ColumnInfo(name = "isFavorite")
+    public boolean isFavorite;
+
 }

@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private StopPostResults postResults;
     private List<StopBusResults> stopBusResultsList;
     private FusedLocationProviderClient fusedLocationClient;
-    private RecyclerView recyclerView;
     private static final String TAG = "MainActivity";
     private BusStopDatabase busStopDatabase;
 
@@ -72,32 +71,50 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         RetrofitClient retrofitClient = RetrofitClient.getInstance();
         retrofitService = getRetrofitService();
 
-        dataUpdate();
 
+        uiUpdateByDatabase();
+        //dataUpdate();
+
+    }
+    private void uiUpdateByDatabase(){
         busStopDatabase = BusStopDatabase.getInstance(this);
+        fetchBusStopsData();
+    }
+    private void fetchBusStopsData(){
         new Thread(() -> {
             List<BusStop> busStops = busStopDatabase.busStopDao().getAllBusStops();
             Log.e(TAG, "onCreate: " + busStops.get(1).busStopId);
+
+            runOnUiThread(() -> {
+                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+                StopsAdpater stopsAdpater = new StopsAdpater(busStops);
+                recyclerView.setAdapter(stopsAdpater);
+                recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+            });
+
         }).start();
-
-
     }
 
+
+
     private void dataUpdate() {
-        fetchRouthData();
+        fetchRouteData();
         fetchBusArrivalData("370000023");
     }
 
     private void initializeUI() {
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+
 
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(this);
 
         textView = findViewById(R.id.gpsLocation);
-        recyclerView = findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -131,10 +148,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     public void busInfoUpdate(){
         //testSearch.setText("refresh");
-        dataUpdate();
+        //dataUpdate();
     }
 
-    private void fetchRouthData() {
+    private void fetchRouteData() {
         Call<PostResult> routeDataCall = retrofitService.getRouteData("All");
         routeDataCall.enqueue(new Callback<PostResult>() {
             @Override
