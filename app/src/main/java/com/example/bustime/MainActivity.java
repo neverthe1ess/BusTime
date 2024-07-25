@@ -82,12 +82,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
     private void fetchBusStopsData(){
         new Thread(() -> {
-            List<BusStop> busStops = busStopDatabase.busStopDao().getAllBusStops();
-            Log.e(TAG, "onCreate: " + busStops.get(1).busStopId);
+            List<BusStop> busStops = busStopDatabase.busStopDao().getFavoriteBusStops();
 
             runOnUiThread(() -> {
                 RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-                StopsAdpater stopsAdpater = new StopsAdpater(busStops);
+                StopsAdpater stopsAdpater = new StopsAdpater(busStops, new StopsAdpater.FavoriteClickListener() {
+                    @Override
+                    public void onFavoriteClick(BusStop busStop) {
+                        updateFavoriteInDatabase(busStop);
+                    }
+                });
                 recyclerView.setAdapter(stopsAdpater);
                 recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
             });
@@ -95,7 +99,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }).start();
     }
 
-
+    private void updateFavoriteInDatabase(BusStop busStop){
+        new Thread(() -> {
+            busStopDatabase.busStopDao().updateBusStop(busStop);
+        }).start();
+    }
 
     private void dataUpdate() {
         fetchRouteData();
@@ -108,8 +116,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         if(getSupportActionBar() != null){
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
-
-
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -127,13 +133,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //testSearch.setText(query + "검색함!");
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //testSearch.setText(newText + "검색함!");
                 return true;
             }
         });
@@ -147,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     public void busInfoUpdate(){
-        //testSearch.setText("refresh");
         //dataUpdate();
     }
 

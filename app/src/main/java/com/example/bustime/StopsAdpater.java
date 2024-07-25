@@ -15,9 +15,15 @@ import java.util.List;
 
 public class StopsAdpater extends RecyclerView.Adapter<StopsAdpater.ViewHolder> {
     private List<BusStop> busStopList;
+    private FavoriteClickListener favoriteClickListener;
 
-    public StopsAdpater(List<BusStop> busStopList){
+    public interface FavoriteClickListener {
+        void onFavoriteClick(BusStop busStop);
+    }
+
+    public StopsAdpater(List<BusStop> busStopList, FavoriteClickListener listener){
         this.busStopList = busStopList;
+        this.favoriteClickListener = listener;
     }
 
     @NonNull
@@ -30,9 +36,19 @@ public class StopsAdpater extends RecyclerView.Adapter<StopsAdpater.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.getBusStopName().setText(busStopList.get(position).stationName);
-            holder.getBusStopNumber().setText(String.valueOf(busStopList.get(position).busStopId));
+        BusStop busStopEntity = busStopList.get(position);
+        holder.getBusStopName().setText(busStopEntity.stationName);
+        holder.getBusStopNumber().setText(String.valueOf(busStopEntity.busStopId));
+        holder.getFavoriteButton().setImageResource(busStopEntity.isFavorite ?
+                R.drawable.baseline_favorite_24 : R.drawable.baseline_favorite_border_24);
+        holder.getFavoriteButton().setOnClickListener(v -> {
+            busStopEntity.isFavorite = !busStopEntity.isFavorite;
+            notifyItemChanged(position);
+            favoriteClickListener.onFavoriteClick(busStopEntity);
+        });
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -65,3 +81,4 @@ public class StopsAdpater extends RecyclerView.Adapter<StopsAdpater.ViewHolder> 
         }
     }
 }
+
