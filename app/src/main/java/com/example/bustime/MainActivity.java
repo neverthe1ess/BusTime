@@ -4,10 +4,12 @@ import static com.example.bustime.repository.api.RetrofitClient.getRetrofitServi
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -31,6 +33,8 @@ import com.example.bustime.repository.api.dto.stopData.StopBusResults;
 import com.example.bustime.repository.api.dto.stopData.StopPostResults;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private FusedLocationProviderClient fusedLocationClient;
     private static final String TAG = "MainActivity";
     private BusStopDatabase busStopDatabase;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +81,34 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         //dataUpdate();
 
     }
+
+    private void setupBottomNavigation(){
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Fragment selectedFragment = null;
+
+                if (item.getItemId() == R.id.navigation_home) {
+                    selectedFragment = new HomeFragment();
+                }
+                if(selectedFragment != null){
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container_view, selectedFragment)
+                            .commit();
+                }
+
+
+                return true;
+            }
+        });
+
+
+    }
+
+
+
+
     private void uiUpdateByDatabase(){
         busStopDatabase = BusStopDatabase.getInstance(this);
         fetchBusStopsData();

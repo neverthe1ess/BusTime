@@ -2,18 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/navigation_home"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/baseline_home_24"
         android:enabled="true"
         android:title="홈" />
     <item
+        android:id="@+id/navigation_favorites"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/baseline_library_add_24"
         android:enabled="true"
         android:title="즐겨찾기" />
     <item
+        android:id="@+id/navigation_settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/baseline_settings_24"

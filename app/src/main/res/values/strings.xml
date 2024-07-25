@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">BusTime</string>
     <string name="search_hint">버스 정류장, 버스 노선 번호</string>
-    <string name="menu_refresh" >새로고침</string>
+    <string name="menu_refresh">새로고침</string>
     <string name="appTitle">BUSTIME</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
