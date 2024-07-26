@@ -5,12 +5,16 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.bustime.repositorydatabase.BusStop;
 import com.example.bustime.repositorydatabase.BusStopDatabase;
 
 public class HomeFragment extends Fragment {
@@ -40,7 +44,35 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        recyclerView = view.findViewById(R.id.recyclerView2);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        busStopDatabase = BusStopDatabase.getInstance(getContext());
+        loadBusStops();
+    }
+
+    private void loadBusStops(){
+        new Thread(() -> {
+            List<BusStop> busStops = busStopDatabase.busStopDao().getAllBusStops();
+            getActivity().runOnUiThread(() -> {
+                stopsAdpater = new StopsAdpater(busStops, new StopsAdpater.FavoriteClickListener() {
+                    @Override
+                    public void onFavoriteClick(BusStop busStop) {
+                        updateFavoriteStatus(busStop);
+                    }
+                });
+                recyclerView.setAdapter(stopsAdpater);
+            });
+        }).start();
+    }
+
+    private void updateFavoriteStatus(BusStop busStop){
+        new Thread(() -> {
+            busStopDatabase.busStopDao().updateBusStop(busStop);
+            getActivity().runOnUiThread(() -> {
+                stopsAdpater.notifyDataSetChanged();
+            });
+        }).start();
     }
 
 

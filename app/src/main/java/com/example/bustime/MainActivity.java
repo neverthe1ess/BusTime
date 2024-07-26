@@ -82,6 +82,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     }
 
+    private void uiUpdateByDatabase(){
+        busStopDatabase = BusStopDatabase.getInstance(this);
+        //fetchBusStopsData();
+        setupBottomNavigation();
+    }
+
     private void setupBottomNavigation(){
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -106,16 +112,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
 
-
-    }
-
-
-
-
-    private void uiUpdateByDatabase(){
-        busStopDatabase = BusStopDatabase.getInstance(this);
-        fetchBusStopsData();
-        setupBottomNavigation();
     }
 
     private void fetchBusStopsData(){
