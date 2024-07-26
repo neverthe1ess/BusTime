@@ -106,8 +106,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                             .replace(R.id.fragment_container_view, selectedFragment)
                             .commit();
                 }
-
-
                 return true;
             }
         });
@@ -119,15 +117,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             List<BusStop> busStops = busStopDatabase.busStopDao().getFavoriteBusStops();
 
             runOnUiThread(() -> {
-                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+                //RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
                 StopsAdpater stopsAdpater = new StopsAdpater(busStops, new StopsAdpater.FavoriteClickListener() {
                     @Override
                     public void onFavoriteClick(BusStop busStop) {
                         updateFavoriteInDatabase(busStop);
                     }
                 });
-                recyclerView.setAdapter(stopsAdpater);
-                recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                //TODO 수정 필요
+                //recyclerView.setAdapter(stopsAdpater);
+                //recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
             });
 
         }).start();
@@ -154,8 +153,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         swipeRefreshLayout.setOnRefreshListener(this);
 
         textView = findViewById(R.id.gpsLocation);
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -221,12 +218,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     postResults = response.body();
                     stopBusResultsList = postResults.getStArriveResults();
 
-                    // 추출해보자
-                    RecyclerView mRecycleView = (RecyclerView) findViewById(R.id.recyclerView);
-                    CustomAdapter mCustomAdapter = new CustomAdapter(postResults, stopBusResultsList);
-                    mRecycleView.setAdapter(mCustomAdapter);
-                    mRecycleView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-
+                    // TODO 나중에 추출 하기
+//                    RecyclerView mRecycleView = (RecyclerView) findViewById(R.id.recyclerView);
+//                    CustomAdapter mCustomAdapter = new CustomAdapter(postResults, stopBusResultsList);
+//                    mRecycleView.setAdapter(mCustomAdapter);
+//                    mRecycleView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                     Log.e(TAG, "onResponse: 성공, 결과\n" + postResults.toString());
                 } else { // 3xx ~ 4xx
                     try {

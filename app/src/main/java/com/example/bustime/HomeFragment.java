@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.example.bustime.repositorydatabase.BusStop;
 import com.example.bustime.repositorydatabase.BusStopDatabase;
@@ -21,6 +22,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private StopsAdpater stopsAdpater;
     private BusStopDatabase busStopDatabase;
+    private ImageView emptyWarningImgView;
 
 
 
@@ -47,13 +49,20 @@ public class HomeFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView2);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        emptyWarningImgView = view.findViewById(R.id.empty_warning_imgView);
+
         busStopDatabase = BusStopDatabase.getInstance(getContext());
         loadBusStops();
     }
 
     private void loadBusStops(){
         new Thread(() -> {
-            List<BusStop> busStops = busStopDatabase.busStopDao().getAllBusStops();
+            List<BusStop> busStops = busStopDatabase.busStopDao().getFavoriteBusStops();
+            if(busStops.isEmpty()) {
+                emptyWarningImgView.setVisibility(View.VISIBLE);
+            } else {
+                emptyWarningImgView.setVisibility(View.INVISIBLE);
+            }
             getActivity().runOnUiThread(() -> {
                 stopsAdpater = new StopsAdpater(busStops, new StopsAdpater.FavoriteClickListener() {
                     @Override

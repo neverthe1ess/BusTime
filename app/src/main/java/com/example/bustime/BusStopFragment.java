@@ -34,7 +34,6 @@ public class BusStopFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_stops, container, false);
     }
 
@@ -51,7 +50,7 @@ public class BusStopFragment extends Fragment {
 
     private void loadBusStops(){
         new Thread(() -> {
-            List<BusStop> busStops = busStopDatabase.busStopDao().getFavoriteBusStops();
+            List<BusStop> busStops = busStopDatabase.busStopDao().getAllBusStops();
             getActivity().runOnUiThread(() -> {
                 stopsAdpater = new StopsAdpater(busStops, new StopsAdpater.FavoriteClickListener() {
                     @Override

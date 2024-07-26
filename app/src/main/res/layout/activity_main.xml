@@ -30,18 +30,11 @@
             android:id="@+id/fragment_container_view"
             android:name="com.example.bustime.HomeFragment"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:layout_editor_absoluteY="261dp" />
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -49,20 +42,21 @@
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
             android:theme="@style/ToolbarTheme"
-            app:title="@string/appTitle"
-            app:titleTextColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" >
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/appTitle"
+            app:titleTextColor="@color/black">
 
             <TextView
+                android:id="@+id/title_toolbar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView3"
-                android:text="@string/appTitle"
                 android:layout_gravity="center"
-                android:textSize="20sp"
-                android:fontFamily="@font/inter_semibold"/>
+                android:fontFamily="@font/inter_semibold"
+                android:text="@string/appTitle"
+                android:textSize="23sp"
+                android:layout_marginBottom="15dp"/>
         </androidx.appcompat.widget.Toolbar>
 
         <TextView
@@ -77,14 +71,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/bottomNavigationView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintVertical_bias="0.0" />
-
-        <ImageView
-            android:id="@+id/empty_warning_imgView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
-            android:visibility="gone"
-            app:srcCompat="@drawable/empty_warning" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

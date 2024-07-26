@@ -8,7 +8,7 @@
     tools:context=".IntroActivity">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/intro_logo_imgView"
         android:layout_width="256dp"
         android:layout_height="123dp"
         app:layout_constraintBottom_toBottomOf="parent"
