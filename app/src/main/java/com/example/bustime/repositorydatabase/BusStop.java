@@ -1,10 +1,8 @@
-package com.example.bustime.bustimedatabase;
+package com.example.bustime.repositorydatabase;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
-import org.jetbrains.annotations.NotNull;
 
 @Entity
 public class BusStop {

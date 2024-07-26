@@ -24,8 +24,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.bustime.bustimedatabase.BusStop;
-import com.example.bustime.bustimedatabase.BusStopDatabase;
+import com.example.bustime.repositorydatabase.BusStop;
+import com.example.bustime.repositorydatabase.BusStopDatabase;
 import com.example.bustime.repository.api.RetrofitClient;
 import com.example.bustime.repository.api.RetrofitService;
 import com.example.bustime.repository.api.dto.routeData.PostResult;
@@ -91,7 +91,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
                 if (item.getItemId() == R.id.navigation_home) {
                     selectedFragment = new HomeFragment();
+                } else if(item.getItemId() == R.id.navigation_favorites){
+                    selectedFragment = new BusStopFragment();
                 }
+
                 if(selectedFragment != null){
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container_view, selectedFragment)
@@ -112,7 +115,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private void uiUpdateByDatabase(){
         busStopDatabase = BusStopDatabase.getInstance(this);
         fetchBusStopsData();
+        setupBottomNavigation();
     }
+
     private void fetchBusStopsData(){
         new Thread(() -> {
             List<BusStop> busStops = busStopDatabase.busStopDao().getFavoriteBusStops();
