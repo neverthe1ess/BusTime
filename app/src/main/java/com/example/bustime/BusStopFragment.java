@@ -14,12 +14,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bustime.repositorydatabase.BusStop;
 import com.example.bustime.repositorydatabase.BusStopDatabase;
 
-import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class BusStopFragment extends Fragment {
     private RecyclerView recyclerView;
     private StopsAdpater stopsAdpater;
     private BusStopDatabase busStopDatabase;
+    private CompositeDisposable disposables = new CompositeDisposable();
 
 
     public BusStopFragment() {
@@ -49,26 +55,36 @@ public class BusStopFragment extends Fragment {
     }
 
     private void loadBusStops(){
-        new Thread(() -> {
-            List<BusStop> busStops = busStopDatabase.busStopDao().getAllBusStops();
-            getActivity().runOnUiThread(() -> {
-                stopsAdpater = new StopsAdpater(busStops, new StopsAdpater.FavoriteClickListener() {
-                    @Override
-                    public void onFavoriteClick(BusStop busStop) {
-                        updateFavoriteStatus(busStop);
-                    }
-                });
-                recyclerView.setAdapter(stopsAdpater);
-            });
-        }).start();
+        disposables.add(
+                Single.fromCallable(() -> busStopDatabase.busStopDao().getAllBusStops())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(busStops -> {
+                            stopsAdpater = new StopsAdpater(busStops, this::updateFavoriteStatus);
+                            recyclerView.setAdapter(stopsAdpater);
+                        }, throwable -> {
+                            // 에러 처리
+                        })
+        );
     }
 
+
     private void updateFavoriteStatus(BusStop busStop){
-        new Thread(() -> {
-            busStopDatabase.busStopDao().updateBusStop(busStop);
-            getActivity().runOnUiThread(() -> {
-                stopsAdpater.notifyDataSetChanged();
-            });
-        }).start();
+        disposables.add(
+                Completable.fromAction(() -> busStopDatabase.busStopDao().updateBusStop(busStop))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(() -> {
+                            stopsAdpater.notifyDataSetChanged();
+                        }, throwable -> {
+                            // 에러 처리
+                        })
+        );
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        disposables.clear();
     }
 }
