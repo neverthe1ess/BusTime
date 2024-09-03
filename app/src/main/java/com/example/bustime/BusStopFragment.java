@@ -60,7 +60,7 @@ public class BusStopFragment extends Fragment {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(busStops -> {
-                            stopsAdpater = new StopsAdpater(busStops, this::updateFavoriteStatus);
+                            stopsAdpater = new StopsAdpater(busStops, this::updateFavoriteStatus, busStop -> {});
                             recyclerView.setAdapter(stopsAdpater);
                         }, throwable -> {
                             // 에러 처리

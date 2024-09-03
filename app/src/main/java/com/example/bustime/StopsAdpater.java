@@ -1,10 +1,12 @@
 package com.example.bustime;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,14 +18,20 @@ import java.util.List;
 public class StopsAdpater extends RecyclerView.Adapter<StopsAdpater.ViewHolder> {
     private List<BusStop> busStopList;
     private FavoriteClickListener favoriteClickListener;
+    private ItemClickListener itemClickListener;
 
     public interface FavoriteClickListener {
         void onFavoriteClick(BusStop busStop);
     }
 
-    public StopsAdpater(List<BusStop> busStopList, FavoriteClickListener listener){
+    public interface ItemClickListener {
+        void onItemClick(BusStop busStop);
+    }
+
+    public StopsAdpater(List<BusStop> busStopList, FavoriteClickListener listener, ItemClickListener itemClickListener){
         this.busStopList = busStopList;
         this.favoriteClickListener = listener;
+        this.itemClickListener = itemClickListener;
     }
 
     @NonNull
@@ -46,6 +54,12 @@ public class StopsAdpater extends RecyclerView.Adapter<StopsAdpater.ViewHolder> 
             notifyItemChanged(position);
             favoriteClickListener.onFavoriteClick(busStopEntity);
         });
+        holder.itemView.setOnClickListener(v -> {
+            if(itemClickListener != null){
+                itemClickListener.onItemClick(busStopEntity);
+            }
+        });
+
     }
 
 

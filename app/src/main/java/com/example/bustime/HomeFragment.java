@@ -1,5 +1,6 @@
 package com.example.bustime;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,8 +24,6 @@ public class HomeFragment extends Fragment {
     private StopsAdpater stopsAdpater;
     private BusStopDatabase busStopDatabase;
     private ImageView emptyWarningImgView;
-
-
 
     public HomeFragment() {
         super(R.layout.fragment_home);
@@ -69,6 +68,12 @@ public class HomeFragment extends Fragment {
                     public void onFavoriteClick(BusStop busStop) {
                         updateFavoriteStatus(busStop);
                     }
+                }, busStop -> {
+                    Intent intent = new Intent(getActivity(), StopInfoActivity.class);
+                    intent.putExtra("BUS_STOP_ID", busStop.busStopId);
+                    intent.putExtra("BUS_STOP_NAME", busStop.stationName);
+                    intent.putExtra("BUS_STOP_ENG_NAME", busStop.stationEngName);
+                    startActivity(intent);
                 });
                 recyclerView.setAdapter(stopsAdpater);
             });

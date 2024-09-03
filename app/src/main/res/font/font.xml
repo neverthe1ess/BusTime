@@ -7,6 +7,11 @@
         />
     <font
         android:font="@font/bareon_bold"
+        android:fontWeight="700"
+        android:fontStyle="normal"
+        />
+    <font
+        android:font="@font/bareon_regular"
         android:fontWeight="400"
         android:fontStyle="normal"
         />
