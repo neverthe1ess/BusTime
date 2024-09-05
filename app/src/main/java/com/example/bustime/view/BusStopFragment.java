@@ -1,4 +1,4 @@
-package com.example.bustime;
+package com.example.bustime.view;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,11 +8,16 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bustime.R;
+import com.example.bustime.adapter.BusStopsAdpater;
 import com.example.bustime.repositorydatabase.BusStop;
 import com.example.bustime.repositorydatabase.BusStopDatabase;
+import com.example.bustime.viewmodel.MainViewModel;
 
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -23,9 +28,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class BusStopFragment extends Fragment {
     private RecyclerView recyclerView;
-    private StopsAdpater stopsAdpater;
+    private BusStopsAdpater busStopsAdpater;
     private BusStopDatabase busStopDatabase;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private MainViewModel viewModel;
 
 
     public BusStopFragment() {
@@ -52,6 +58,13 @@ public class BusStopFragment extends Fragment {
 
         busStopDatabase = BusStopDatabase.getInstance(getContext());
         loadBusStops();
+
+        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        viewModel.getSearchQuery().observe(getViewLifecycleOwner(), query -> {
+            if(busStopsAdpater != null){
+                busStopsAdpater.filter(query);
+            }
+        });
     }
 
     private void loadBusStops(){
@@ -60,8 +73,8 @@ public class BusStopFragment extends Fragment {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(busStops -> {
-                            stopsAdpater = new StopsAdpater(busStops, this::updateFavoriteStatus, busStop -> {});
-                            recyclerView.setAdapter(stopsAdpater);
+                            busStopsAdpater = new BusStopsAdpater(busStops, this::updateFavoriteStatus, busStop -> {});
+                            recyclerView.setAdapter(busStopsAdpater);
                         }, throwable -> {
                             // 에러 처리
                         })
@@ -75,7 +88,7 @@ public class BusStopFragment extends Fragment {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {
-                            stopsAdpater.notifyDataSetChanged();
+                            busStopsAdpater.notifyDataSetChanged();
                         }, throwable -> {
                             // 에러 처리
                         })

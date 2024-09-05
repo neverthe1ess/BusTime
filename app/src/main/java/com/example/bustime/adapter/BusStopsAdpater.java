@@ -1,22 +1,23 @@
-package com.example.bustime;
+package com.example.bustime.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bustime.R;
 import com.example.bustime.repositorydatabase.BusStop;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class StopsAdpater extends RecyclerView.Adapter<StopsAdpater.ViewHolder> {
+public class BusStopsAdpater extends RecyclerView.Adapter<BusStopsAdpater.ViewHolder> {
     private List<BusStop> busStopList;
+    private List<BusStop> busStopListFull;
     private FavoriteClickListener favoriteClickListener;
     private ItemClickListener itemClickListener;
 
@@ -28,10 +29,11 @@ public class StopsAdpater extends RecyclerView.Adapter<StopsAdpater.ViewHolder> 
         void onItemClick(BusStop busStop);
     }
 
-    public StopsAdpater(List<BusStop> busStopList, FavoriteClickListener listener, ItemClickListener itemClickListener){
+    public BusStopsAdpater(List<BusStop> busStopList, FavoriteClickListener listener, ItemClickListener itemClickListener){
         this.busStopList = busStopList;
         this.favoriteClickListener = listener;
         this.itemClickListener = itemClickListener;
+        busStopListFull = new ArrayList<>(busStopList); // 기존 List copy
     }
 
     @NonNull
@@ -59,7 +61,21 @@ public class StopsAdpater extends RecyclerView.Adapter<StopsAdpater.ViewHolder> 
                 itemClickListener.onItemClick(busStopEntity);
             }
         });
+    }
 
+    public void filter(String text){
+        busStopList.clear();
+        if(text.isEmpty()){
+            busStopList.addAll(busStopListFull);
+        } else {
+            text = text.toLowerCase();
+            for(BusStop busStopItem : busStopListFull){
+                if(busStopItem.stationName.toLowerCase().contains(text)){
+                    busStopList.add(busStopItem);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 
 

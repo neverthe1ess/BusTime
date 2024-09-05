@@ -1,13 +1,14 @@
-package com.example.bustime;
+package com.example.bustime.viewmodel;
 
 import android.app.Application;
 import android.util.Log;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.bustime.MainRepository;
 import com.example.bustime.repository.api.dto.stopData.StopBusResults;
 import com.example.bustime.repository.api.dto.stopData.StopPostResults;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -18,6 +19,7 @@ public class MainViewModel extends AndroidViewModel {
     private static final String TAG = "MainViewModel";
     private MutableLiveData<List<StopBusResults>> stopBusResultsLiveData = new MutableLiveData<>();
     private MutableLiveData<String> locationLiveData = new MutableLiveData<>();
+    private MutableLiveData<String> searchQuery = new MutableLiveData<>();
     private MainRepository repository;
 
     public MainViewModel(Application application) {
@@ -30,6 +32,9 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<String> getLocation(){
         return locationLiveData;
     }
+    public LiveData<String> getSearchQuery(){
+        return searchQuery;
+    }
 
     public void fetchBusArrivalData(String busStopId){
         repository.fetchBusArrivalData(busStopId, new MainRepository.ApiCallback<StopPostResults>(){
@@ -41,6 +46,7 @@ public class MainViewModel extends AndroidViewModel {
 
             @Override
             public void onError(String error){
+                Toast.makeText(getApplication(), "네트워크 연결 오류", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "fetchBusArrivalData: 실패 - " + error);
             }
         });
@@ -58,5 +64,7 @@ public class MainViewModel extends AndroidViewModel {
             }
         });
     }
-
+    public void setSearchQuery(String query){
+        searchQuery.setValue(query);
+    }
 }

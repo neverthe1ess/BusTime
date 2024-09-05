@@ -21,7 +21,7 @@ public interface RetrofitService {
     @GET("api/route/getDataList")
     Call<PostResult> getRouteData(@Query("type") String type);
 
-    //4. 노선 별 정류소 정보 https://bus.andong.go.kr:8080/api/route/station/getDataList?routeId=354300491
+    //4. 노선 별 정류소 정보 http://bus.andong.go.kr:8080/api/route/station/getDataList?routeId=354300491
     @GET("api/route/station/getDataList")
     Call<PostResult> getRouteStation(@Query("routeId=") String stationId);
 

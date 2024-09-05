@@ -1,4 +1,4 @@
-package com.example.bustime;
+package com.example.bustime.model;
 
 import android.content.Context;
 
