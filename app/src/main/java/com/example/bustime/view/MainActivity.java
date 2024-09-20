@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         initializeUI();
         setupObservers();
 
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ){
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -84,10 +83,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
             if (item.getItemId() == R.id.navigation_home) {
                 selectedFragment = new HomeFragment();
+                swipeRefreshLayout.setEnabled(true);
             } else if(item.getItemId() == R.id.navigation_favorites){
                 selectedFragment = new BusStopFragment();
+                swipeRefreshLayout.setEnabled(true);
             } else if(item.getItemId() == R.id.navigation_timetable){
                 selectedFragment = new TimeTableFragment();
+                swipeRefreshLayout.setEnabled(false);
             }
 
             if(selectedFragment != null){
@@ -126,7 +128,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     //TODO onRefresh 수정하기
     @Override
     public void onRefresh() {
-        viewModel.fetchBusArrivalData("370000023");
+        viewModel.getCurrentLocation(fusedLocationClient);
+        viewModel.getLocation();
         swipeRefreshLayout.setRefreshing(false);
     }
 

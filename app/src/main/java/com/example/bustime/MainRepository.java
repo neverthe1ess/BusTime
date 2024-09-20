@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 
 import com.example.bustime.repository.api.RetrofitClient;
 import com.example.bustime.repository.api.RetrofitService;
@@ -12,7 +13,11 @@ import com.example.bustime.repository.api.dto.routeData.PostResult;
 import com.example.bustime.repository.api.dto.stopData.StopPostResults;
 import com.example.bustime.repositorydatabase.BusStop;
 import com.example.bustime.repositorydatabase.BusStopDatabase;
+import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.CancellationTokenSource;
 
 import java.util.List;
 
@@ -79,10 +84,12 @@ public class MainRepository {
     //TODO 퍼미션 체크 함수 만들기.
     @SuppressLint("MissingPermission")
     public void getCurrentLocation(FusedLocationProviderClient fusedLocationClient, LocationCallback callback){
-        fusedLocationClient.getLastLocation()
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.getToken())
                 .addOnSuccessListener(location -> {
                     if (location != null) {
                         String locationString = "Latitude: " + location.getLatitude() + "\nLongitude: " + location.getLongitude();
+                        //Toast.makeText(context.getApplicationContext(), "위치 확인함", Toast.LENGTH_SHORT).show();
                         callback.onLocationResult(locationString);
                     } else {
                         callback.onError("위치 정보를 가져올 수 없습니다");
@@ -90,7 +97,6 @@ public class MainRepository {
                 })
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
-    // TODO 쓰레드 이슈 해결하기
     public void getFavoriteBusStops(ApiCallback<List<BusStop>> callback){
         new Thread(() -> {
             List<BusStop> busStops = busStopDatabase.busStopDao().getFavoriteBusStops();

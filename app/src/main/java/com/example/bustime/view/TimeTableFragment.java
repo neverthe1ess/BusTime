@@ -79,7 +79,6 @@ public class TimeTableFragment extends Fragment {
         timetableWebView.getSettings().setBuiltInZoomControls(true); //화면 확대 축소 사용 여부
         timetableWebView.getSettings().setDisplayZoomControls(true); //화면 확대 축소시, webview에서 확대/축소 컨트롤 표시 여부
         timetableWebView.loadUrl("https://www.andong.go.kr/synap/skin/doc.html?fn=FILE_000000000534115_0&rs=/synap/BBS/FILE_000000000534115_0/");
-//        timetableWebView.loadUrl("https://www.andong.go.kr/synap/skin/doc.html?fn=FILE_000000000534115_0&rs=/synap/BBS/FILE_000000000534115_0/");
 
     }
 }
