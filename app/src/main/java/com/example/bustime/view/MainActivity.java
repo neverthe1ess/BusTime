@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 selectedFragment = new HomeFragment();
             } else if(item.getItemId() == R.id.navigation_favorites){
                 selectedFragment = new BusStopFragment();
+            } else if(item.getItemId() == R.id.navigation_timetable){
+                selectedFragment = new TimeTableFragment();
             }
 
             if(selectedFragment != null){
