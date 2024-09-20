@@ -1,5 +1,6 @@
 package com.example.bustime.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,7 +74,13 @@ public class BusStopFragment extends Fragment {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(busStops -> {
-                            busStopsAdpater = new BusStopsAdpater(busStops, this::updateFavoriteStatus, busStop -> {});
+                            busStopsAdpater = new BusStopsAdpater(busStops, this::updateFavoriteStatus, busStop -> {
+                                Intent intent = new Intent(getActivity(), StopInfoActivity.class);
+                                intent.putExtra("BUS_STOP_ID", busStop.busStopId);
+                                intent.putExtra("BUS_STOP_NAME", busStop.stationName);
+                                intent.putExtra("BUS_STOP_ENG_NAME", busStop.stationEngName);
+                                startActivity(intent);
+                            });
                             recyclerView.setAdapter(busStopsAdpater);
                         }, throwable -> {
                             // 에러 처리

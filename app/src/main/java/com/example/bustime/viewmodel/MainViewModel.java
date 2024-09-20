@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.bustime.MainRepository;
 import com.example.bustime.repository.api.dto.stopData.StopBusResults;
 import com.example.bustime.repository.api.dto.stopData.StopPostResults;
+import com.example.bustime.repositorydatabase.BusStop;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public class MainViewModel extends AndroidViewModel {
     private MutableLiveData<List<StopBusResults>> stopBusResultsLiveData = new MutableLiveData<>();
     private MutableLiveData<String> locationLiveData = new MutableLiveData<>();
     private MutableLiveData<String> searchQuery = new MutableLiveData<>();
+    private MutableLiveData<Boolean> favoriteUpdateStatus = new MutableLiveData<>();
+    private MutableLiveData<List<BusStop>> favoriteBusStops = new MutableLiveData<>();
     private MainRepository repository;
 
     public MainViewModel(Application application) {
@@ -35,6 +38,8 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<String> getSearchQuery(){
         return searchQuery;
     }
+    public LiveData<Boolean> getFavoriteUpdateStatus() {return favoriteUpdateStatus; }
+    public LiveData<List<BusStop>> getFavoriteBusStops(){return favoriteBusStops;}
 
     public void fetchBusArrivalData(String busStopId){
         repository.fetchBusArrivalData(busStopId, new MainRepository.ApiCallback<StopPostResults>(){
@@ -64,6 +69,27 @@ public class MainViewModel extends AndroidViewModel {
             }
         });
     }
+
+    public void updateFavoriteStatus(BusStop busStop) {
+        repository.updateFavoriteStatus(busStop);
+    }
+
+    public void fetchFavoriteBusStops(){
+        // TODO 인터페이스 만들기
+        repository.getFavoriteBusStops(new MainRepository.ApiCallback<List<BusStop>>(){
+            @Override
+            public void onSuccess(List<BusStop> result) {
+                favoriteBusStops.setValue(result);
+            }
+            //TODO 생각해보기
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+    }
+
+
     public void setSearchQuery(String query){
         searchQuery.setValue(query);
     }

@@ -21,21 +21,14 @@ import android.widget.Toast;
 
 import com.example.bustime.viewmodel.MainViewModel;
 import com.example.bustime.R;
-import com.example.bustime.repositorydatabase.BusStopDatabase;
-import com.example.bustime.repository.api.RetrofitService;
-import com.example.bustime.repository.api.dto.stopData.StopBusResults;
-import com.example.bustime.repository.api.dto.stopData.StopPostResults;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     MenuItem mSearch;
-    TextView textView;
+    TextView gpsLocationTextView;
     SwipeRefreshLayout swipeRefreshLayout;
     private FusedLocationProviderClient fusedLocationClient;
     private static final String TAG = "MainActivity";
@@ -57,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ){
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         } else {
-            viewModel.getLocation();
+            viewModel.getCurrentLocation(fusedLocationClient);
         }
         setupBottomNavigation();
     }
@@ -70,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(this);
-        textView = findViewById(R.id.gpsLocation);
+        gpsLocationTextView = findViewById(R.id.gpsLocation);
     }
 
     private void setupObservers(){
@@ -80,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             Log.e(TAG, "setupObservers: " + stopBusResults.toString());
         });
         viewModel.getLocation().observe(this, location -> {
-            textView.setText(location);
+            gpsLocationTextView.setText(location);
         });
     }
 
@@ -111,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mSearch = menu.findItem(R.id.search);
 
         SearchView sv = (SearchView) mSearch.getActionView();
+        sv.setQueryHint(" 정류장 검색");
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -138,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 //isGranted가 ActivityResultCallback 구현임. 람다식
                 if(isGranted){
-                    viewModel.getLocation();
+                   viewModel.getLocation();
                 } else {
                     Toast.makeText(MainActivity.this, "위치 권한이 거부되었습니다", Toast.LENGTH_SHORT).show();
                 }

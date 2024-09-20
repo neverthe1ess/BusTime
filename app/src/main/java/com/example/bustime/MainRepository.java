@@ -3,12 +3,18 @@ package com.example.bustime;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.example.bustime.repository.api.RetrofitClient;
 import com.example.bustime.repository.api.RetrofitService;
 import com.example.bustime.repository.api.dto.routeData.PostResult;
 import com.example.bustime.repository.api.dto.stopData.StopPostResults;
+import com.example.bustime.repositorydatabase.BusStop;
+import com.example.bustime.repositorydatabase.BusStopDatabase;
 import com.google.android.gms.location.FusedLocationProviderClient;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -18,11 +24,13 @@ public class MainRepository {
     private RetrofitService retrofitService;
     private RetrofitClient retrofitClient;
     private Context context;
+    private BusStopDatabase busStopDatabase;
 
     public MainRepository(Application application){
         this.context = application.getApplicationContext();
         retrofitClient = RetrofitClient.getInstance();
         retrofitService = RetrofitClient.getRetrofitService();
+        busStopDatabase = BusStopDatabase.getInstance(application);
     }
 
     public void fetchRouteData(ApiCallback<PostResult> callback){
@@ -62,6 +70,11 @@ public class MainRepository {
         });
     }
 
+    public void updateFavoriteStatus(BusStop busStop){
+        new Thread(() -> {
+            busStopDatabase.busStopDao().updateBusStop(busStop);
+        }).start();
+    }
 
     //TODO 퍼미션 체크 함수 만들기.
     @SuppressLint("MissingPermission")
@@ -77,6 +90,18 @@ public class MainRepository {
                 })
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
+    // TODO 쓰레드 이슈 해결하기
+    public void getFavoriteBusStops(ApiCallback<List<BusStop>> callback){
+        new Thread(() -> {
+            List<BusStop> busStops = busStopDatabase.busStopDao().getFavoriteBusStops();
+            if(busStops != null){
+                new Handler(Looper.getMainLooper()).post(() -> callback.onSuccess(busStops));
+            } else {
+                new Handler(Looper.getMainLooper()).post(() -> callback.onError("즐겨찾기 목록을 가져올 수 없습니다"));
+            }
+        }).start();
+    }
+
 
     public interface ApiCallback<T>{
         void onSuccess(T result);

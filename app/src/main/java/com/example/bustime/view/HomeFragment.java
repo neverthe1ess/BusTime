@@ -55,50 +55,45 @@ public class HomeFragment extends Fragment {
         emptyWarningImgView = view.findViewById(R.id.empty_warning_imgView);
 
         busStopDatabase = BusStopDatabase.getInstance(getContext());
-        loadBusStops();
-
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         viewModel.getSearchQuery().observe(getViewLifecycleOwner(), query -> {
             if(busStopsAdpater != null){
                 busStopsAdpater.filter(query);
             }
         });
+        loadBusStops();
     }
 
     private void loadBusStops(){
-        new Thread(() -> {
-            List<BusStop> busStops = busStopDatabase.busStopDao().getFavoriteBusStops();
+        viewModel.fetchFavoriteBusStops();
+        viewModel.getFavoriteBusStops().observe(getViewLifecycleOwner(), busStops -> {
             if(busStops.isEmpty()) {
                 emptyWarningImgView.setVisibility(View.VISIBLE);
             } else {
                 emptyWarningImgView.setVisibility(View.INVISIBLE);
             }
-            getActivity().runOnUiThread(() -> {
-                busStopsAdpater = new BusStopsAdpater(busStops, new BusStopsAdpater.FavoriteClickListener() {
-                    @Override
-                    public void onFavoriteClick(BusStop busStop) {
-                        updateFavoriteStatus(busStop);
-                    }
-                }, busStop -> {
-                    Intent intent = new Intent(getActivity(), StopInfoActivity.class);
-                    intent.putExtra("BUS_STOP_ID", busStop.busStopId);
-                    intent.putExtra("BUS_STOP_NAME", busStop.stationName);
-                    intent.putExtra("BUS_STOP_ENG_NAME", busStop.stationEngName);
-                    startActivity(intent);
-                });
-                recyclerView.setAdapter(busStopsAdpater);
+            busStopsAdpater = new BusStopsAdpater(busStops, new BusStopsAdpater.FavoriteClickListener() {
+                @Override
+                public void onFavoriteClick(BusStop busStop) {
+                    updateFavoriteStatus(busStop);
+                }
+            }, busStop -> {
+                Intent intent = new Intent(getActivity(), StopInfoActivity.class);
+                intent.putExtra("BUS_STOP_ID", busStop.busStopId);
+                intent.putExtra("BUS_STOP_NAME", busStop.stationName);
+                intent.putExtra("BUS_STOP_ENG_NAME", busStop.stationEngName);
+                startActivity(intent);
             });
-        }).start();
+            recyclerView.setAdapter(busStopsAdpater);
+        });
     }
 
     private void updateFavoriteStatus(BusStop busStop){
-        new Thread(() -> {
-            busStopDatabase.busStopDao().updateBusStop(busStop);
-            getActivity().runOnUiThread(() -> {
+        viewModel.updateFavoriteStatus(busStop);
+        viewModel.getFavoriteUpdateStatus().observe(getViewLifecycleOwner(), success -> {
+            if(success){
                 busStopsAdpater.notifyDataSetChanged();
-            });
-        }).start();
+            }
+        });
     }
-
-
 }
