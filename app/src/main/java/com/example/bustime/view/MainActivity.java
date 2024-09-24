@@ -27,13 +27,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-    MenuItem mSearch;
-    TextView gpsLocationTextView;
-    SwipeRefreshLayout swipeRefreshLayout;
+    private MenuItem mSearch;
+    private TextView gpsLocationTextView;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private FusedLocationProviderClient fusedLocationClient;
-    private static final String TAG = "MainActivity";
     private BottomNavigationView bottomNavigationView;
     private MainViewModel viewModel;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,22 +42,26 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
-        initializeUI();
+        setupToolbar();
         setupObservers();
+        startLocationTracking();
+        setupBottomNavigation();
+    }
 
+    private void startLocationTracking() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ){
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         } else {
             viewModel.getCurrentLocation(fusedLocationClient);
         }
-        setupBottomNavigation();
     }
 
-    private void initializeUI() {
+    private void setupToolbar() {
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
         if(getSupportActionBar() != null){
+            // 타이틀(BUS_TIME) 제거
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
@@ -67,8 +71,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private void setupObservers(){
         viewModel.getStopBusResults().observe(this, stopBusResults -> {
-            // TODO UPDATE UI WITH stopBusResults
-            // DB 반영
             Log.e(TAG, "setupObservers: " + stopBusResults.toString());
         });
         viewModel.getLocation().observe(this, location -> {
@@ -80,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
-
             if (item.getItemId() == R.id.navigation_home) {
                 selectedFragment = new HomeFragment();
                 swipeRefreshLayout.setEnabled(true);
@@ -108,28 +109,28 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mSearch = menu.findItem(R.id.search);
 
         SearchView sv = (SearchView) mSearch.getActionView();
-        sv.setQueryHint(" 정류장 검색");
-        sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                viewModel.setSearchQuery(query);
-                return true;
-            }
+        if (sv != null) {
+            sv.setQueryHint(" 정류장 검색");
+            sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    viewModel.setSearchQuery(query);
+                    return true;
+                }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                viewModel.setSearchQuery(newText);
-                return true;
-            }
-        });
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    viewModel.setSearchQuery(newText);
+                    return true;
+                }
+            });
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
-    //TODO onRefresh 수정하기
     @Override
     public void onRefresh() {
-        viewModel.getCurrentLocation(fusedLocationClient);
-        viewModel.getLocation();
+        startLocationTracking();
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -137,11 +138,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 //isGranted가 ActivityResultCallback 구현임. 람다식
                 if(isGranted){
-                   viewModel.getLocation();
+                   viewModel.getCurrentLocation(fusedLocationClient);
                 } else {
-                    Toast.makeText(MainActivity.this, "위치 권한이 거부되었습니다", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "정확한 위치 권한을 허용해주세요", Toast.LENGTH_SHORT).show();
                 }
             });
-
-
 }
